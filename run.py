@@ -9,6 +9,11 @@ BASE = str(Path(__file__).resolve().parent)
 UVICORN = f"{BASE}/.venv/bin/uvicorn"
 PYTHON = f"{BASE}/.venv/bin/python"
 
+#loads .env into this process so every server started below (including Toolbox,
+#which reads FIFA_POSTGRES_* from the environment) inherits the variables
+from dotenv import load_dotenv
+load_dotenv(f"{BASE}/.env")
+
 #tracks running processes
 processes = []
 
