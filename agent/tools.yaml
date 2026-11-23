@@ -1,0 +1,59 @@
+kind: source
+name: my-pg-source
+type: postgres
+host: ${FIFA_POSTGRES_HOST}
+port: ${FIFA_POSTGRES_PORT}
+database: ${FIFA_POSTGRES_DATABASE}
+user: ${FIFA_POSTGRES_USER}
+password: ${FIFA_POSTGRES_PASSWORD}
+---
+kind: tool
+name: list_players
+type: postgres-sql
+source: my-pg-source
+description: List all players.
+parameters: []
+statement: SELECT * FROM players;
+---
+kind: tool
+name: country_given_name
+type: postgres-sql
+source: my-pg-source
+description: Give country code for a given player name.
+parameters: 
+  - name: given_player_name
+    type: string
+    description: The name of the player.
+statement: SELECT fifa_code, player_name FROM public.v_squad_players WHERE player_name = $1;
+---
+kind: tool
+name: matches_given_date
+type: postgres-sql
+source: my-pg-source
+description: List all matches for a given date.
+parameters: 
+  - name: given_match_date
+    type: string
+    description: The date for which to list matches.
+#default given in EST timezone, venue_timezone can be added to adjust if needed
+statement: SELECT kickoff_at, match_id FROM public.v_match_schedule WHERE kickoff_at::date = $1;
+---
+kind: tool
+name: match_info_given_id
+type: postgres-sql
+source: my-pg-source
+description: Get information for a match given its ID.
+parameters: 
+  - name: given_match_id
+    type: string
+    description: The ID of the match.
+statement: SELECT home_team_name, away_team_name, kickoff_at, venue_name FROM public.v_match_details WHERE match_id = $1;
+---
+kind: toolset
+name: my-toolset
+tools:
+  - list_players
+  - country_given_name
+  - matches_given_date
+  - match_info_given_id
+
